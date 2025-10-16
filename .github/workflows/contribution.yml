@@ -8,13 +8,13 @@ on:
         default: 'rixz'
       repo_count:
         description: 'Jumlah repository per akun'
-        default: 5
+        default: 25
       total_commits:
         description: "Jumlah total commit per akun"
-        default: 300
+        default: 1650
       total_days:
         description: "Jumlah hari pembagian commit"
-        default: 90
+        default: 365
       total_prs:
         description: "Jumlah Pull Request per akun"
         default: 130
@@ -23,7 +23,7 @@ on:
         default: 120
       target_repo:
         description: "Repository utama (contoh: username/activity-hub)"
-        default: "safarovnatiq/hapus"
+        default: "rami196/hapus"
 
 jobs:
   unified:
@@ -33,7 +33,7 @@ jobs:
       max-parallel: 8   # 🔥 Naikkan paralel dari 5 → 8 (lebih cepat, masih aman)
       matrix:
         include:
-          - account: SafarovNatiq
+          - account: rami196
             email: 15175497+rami196@users.noreply.github.com
             token_secret: PAT1
           - account: rgmauer
