@@ -140,3 +140,61 @@ jobs:
           echo "📊 Summary untuk ${{ matrix.account }}"
           echo "✅ PR sukses: $pr_success"
           echo "✅ Issue sukses: $issue_success"
+# === STEP 4: Auto Create Repositories ===
+- name: Create repositories automatically
+  env:
+    PAT_TOKEN: ${{ secrets[matrix.token_secret] }}
+  run: |
+    set -euo pipefail
+    WORDS=("quantum" "nova" "lumen" "matrix" "orbit" "vector" "sigma" "neon" "delta" "aero" "fusion" "zenith")
+    SUFFIX=("project" "service" "system" "app" "engine" "hub" "core" "cloud" "framework")
+    LANGS=("Python" "C++" "Go" "Swift" "Java" "JavaScript" "Ruby")
+    EXT=("py" "cpp" "go" "swift" "java" "js" "rb")
+    CONTENTS=(
+      "print('Hello from Python!')"
+      "#include <iostream>\nint main(){std::cout << \"Hello from C++!\"; return 0;}"
+      "package main\nimport \"fmt\"\nfunc main(){fmt.Println(\"Hello from Go!\")}"
+      "print(\"Hello from Swift!\")"
+      "public class Main { public static void main(String[] args){ System.out.println(\"Hello from Java!\"); } }"
+      "console.log('Hello from JavaScript!');"
+      "puts 'Hello from Ruby!'"
+    )
+
+    PREFIX=${{ github.event.inputs.repo_prefix }}
+    COUNT=${{ github.event.inputs.repo_count }}
+
+    git config --global user.name "${{ matrix.account }}"
+    git config --global user.email "${{ matrix.email }}"
+
+    echo "=== [${{ matrix.account }}] Auto membuat $COUNT repositori ==="
+
+    for i in $(seq 1 $COUNT); do
+      NAME="${PREFIX}-${WORDS[$RANDOM % ${#WORDS[@]}]}-${SUFFIX[$RANDOM % ${#SUFFIX[@]}]}"
+      LANG_INDEX=$((RANDOM % ${#LANGS[@]}))
+      LANG=${LANGS[$LANG_INDEX]}
+      FILE_EXT=${EXT[$LANG_INDEX]}
+      FILE_CONTENT=${CONTENTS[$LANG_INDEX]}
+      FILE_NAME="main.${FILE_EXT}"
+
+      echo "📦 [$i/$COUNT] Membuat repo: $NAME ($LANG)"
+      response=$(curl -s -H "Authorization: token $PAT_TOKEN" \
+        -d "{\"name\":\"$NAME\",\"auto_init\":true}" \
+        https://api.github.com/user/repos)
+
+      if echo "$response" | grep -q '"full_name"'; then
+        echo "✅ Repository dibuat: $NAME"
+      else
+        echo "⚠️ Gagal membuat repository $NAME"
+        continue
+      fi
+
+      sleep 2
+      git clone https://x-access-token:${PAT_TOKEN}@github.com/${{ matrix.account }}/$NAME.git
+      cd $NAME
+      printf "%b\n" "$FILE_CONTENT" > $FILE_NAME
+      git add .
+      git commit -m "Initial commit ($LANG)"
+      git push origin main --force
+      cd ..
+      rm -rf $NAME
+    done
