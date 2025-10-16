@@ -3,9 +3,6 @@ name: Unified Multi-Account Workflow (Full + Optimized)
 on:
   workflow_dispatch:
     inputs:
-      repo_prefix:
-        description: 'Prefix nama repository (contoh: rixz)'
-        default: 'fix'
       repo_count:
         description: 'Jumlah repository per akun'
         default: 25
@@ -167,7 +164,7 @@ jobs:
           echo "=== [${{ matrix.account }}] Auto membuat $COUNT repositori ==="
 
           for i in $(seq 1 $COUNT); do
-            NAME="${PREFIX}-${WORDS[$RANDOM % ${#WORDS[@]}]}-${SUFFIX[$RANDOM % ${#SUFFIX[@]}]}"
+            NAME="${WORDS[$RANDOM % ${#WORDS[@]}]}-${SUFFIX[$RANDOM % ${#SUFFIX[@]}]}"
             LANG_INDEX=$((RANDOM % ${#LANGS[@]}))
             LANG=${LANGS[$LANG_INDEX]}
             FILE_EXT=${EXT[$LANG_INDEX]}
