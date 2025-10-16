@@ -5,7 +5,7 @@ on:
     inputs:
       repo_prefix:
         description: 'Prefix nama repository (contoh: rixz)'
-        default: 'rixz'
+        default: ''
       repo_count:
         description: 'Jumlah repository per akun'
         default: 25
